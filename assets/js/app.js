@@ -18,8 +18,8 @@ var textPadLeft = 40;
 // Create the actual canvas for the graph
 var svg = d3.select("#scatter") // d3.select() the id "#scatter" element
             .append("svg") // .append() an "svg" tag
-            .attr("width", svgwidth) // set the 'width' attribute to be your variable width
-            .attr("height", svgheight) // set the 'height' attribute to be your variable height
+            .attr("width", width) // set the 'width' attribute to be your variable width
+            .attr("height", height) // set the 'height' attribute to be your variable height
             .classed("chart", true); // give it a class of "chart"
 
 // Set the radius for each dot that will appear in the graph.
@@ -27,11 +27,11 @@ var svg = d3.select("#scatter") // d3.select() the id "#scatter" element
 // it in the mobility section of our code.
 var circleRadius;
 function getCircleRadius(data) {
- if (svgwidth >= 530) {  // check if the width is less than or equal to 530
-    circleRadius = 5; // set the circleRadius to 5
+ if (width >= 530) {  // check if the width is less than or equal to 530
+    circleRadius = 10; // set the circleRadius to 5
   }
   else { // else
-    circleRadius = 10; // set the circleRadius to 10
+    circleRadius = 20; // set the circleRadius to 10
   }
 }
 getCircleRadius();
@@ -61,7 +61,7 @@ xText.append("text") // append a "text" element to the xText group
       .attr("y",-26) // set the "y" attribute to -26
       .attr('data-name','poverty') // set the 'data-name' attribute to 'poverty'
       .attr('data-axis','x') // set the data-axis attribute to 'x'
-      .classed("axis-Text active x", true) // give it class of axisText, active, and x
+      .classed("axisText active x", true) // give it class of axisText, active, and x
       .text("Poverty"); // set the text to be a human readable label
 
 // 2. Age
@@ -106,7 +106,7 @@ yText.append("text") // append a "text" element to the yText group
       .attr('data-name','obesity') // set the 'data-name' attribute to 'obesity'
       .attr('data-axis','y') // set the data-axis attribute to 'y'
       .classed("axisText active y", true) // give it class of axisText, active, and y
-      .text("Obsity"); // set the text to be a human readable label
+      .text("Obesity"); // set the text to be a human readable label
 
 // 2. Smokes
 yText.append("text") // append a "text" element to the yText group
@@ -118,7 +118,7 @@ yText.append("text") // append a "text" element to the yText group
 
 // 3. Lacks Healthcare
 yText.append("text") // append a "text" element to the yText group
-      .attr("y",0) // set the "y" attribute to 0
+      .attr("y",26) // set the "y" attribute to 0
       .attr('data-name','healthcare') // set the 'data-name' attribute to 'healthcare'
       .attr('data-axis','y') // set the data-axis attribute to 'y'
       .classed("axisText inactive y", true) // give it class of axisText, inactive, and y
@@ -139,7 +139,8 @@ d3.csv("assets/data/data.csv").then(function(data) {
     data.age = parseInt(data.age);
     data.income = parseInt(data.income);
   }); // call your visualize() function on the data
-// });
+    visualize(data);
+});
 
 // 3. Create our visualization function
 // ====================================
@@ -206,7 +207,7 @@ function visualize(data) {
   function yMinMax() {
     // min will grab the smallest datum from the selected column.
     yMin = d3.min(data, d => parseFloat(d[currentY]) * 0.90);
-
+// console.log(yMin)
     // .max will grab the largest datum from the selected column.
     yMax = d3.max(data, d => parseFloat(d[currentY]) * 1.10);
   }
@@ -215,7 +216,7 @@ function visualize(data) {
   function labelChange(axis, clickedText) {
     // Switch the currently active to inactive.
     d3.selectAll(".axisText") // d3.selectAll() the elements with class .axisText
-      .filter(".${axis}") // .filter() to only those with class `.${axis}`
+      .filter(`.${axis}`) // .filter() to only those with class `.${axis}`
       .filter(".active")// .filter() to only those with class .active
       .classed("active", false) // remove the class active from the element 
       .classed("inactive", true); // give the element class inactive
@@ -241,7 +242,7 @@ function visualize(data) {
                   .range([margin + labelArea, width - margin]);
  
   var yScale = d3.scaleLinear() // create a d3 linear scale
-                  .domain([xMin, xMax]) // set the domain to be from xMin to xMax
+                  .domain([yMin, yMax]) // set the domain to be from xMin to xMax
                   .range([height - margin - labelArea, margin]);
 
   // We pass the scales into the axis methods to create the axes.
@@ -267,14 +268,14 @@ function visualize(data) {
   // We append the axes in group elements. By calling them, we include
   // all of the numbers, borders and ticks.
   // The transform attribute specifies where to place the axes.
-  svg.append("g") // append a 'g' element to the svg
+  svg.append('g') // append a 'g' element to the svg
       .call(xAxis) // .call() the xAxis
-      .attr(xAxis) // set the class .attr() to be 'xAxis'
+      .classed("xAxis", true) // set the class .attr() to be 'xAxis'
       .attr("transform", `translate(0,${(height - margin - labelArea)})`);
 
-  svg.append("g") // append a 'g' element to the svg
-      .cal(yAxis) // .call() the yAxis
-      .attr(yAxis) // set the class .attr() to be 'yAxis'
+  svg.append('g') // append a 'g' element to the svg
+      .call(yAxis) // .call() the yAxis
+      .classed("yAxis", true) // set the class .attr() to be 'yAxis'
       .attr("transform", `translate(${(margin + labelArea)}, 0)`);
 
   // Now let's make a grouping for our dots and their labels.
@@ -285,9 +286,9 @@ function visualize(data) {
   circlesGroup.append('circle') // append a 'circle' element to the circlesGroup
             // These attr's specify location, size and class.
             .attr('cx', d => xScale(d[currentX])) // set the 'cx' .attr() to map from d => xScale() applied to d[currentX]
-            .attr('cx', d => yScale(d[currentY])) // set the 'cx' .attr() to map from d => yScale() applied to d[currentY]
+            .attr('cy', d => yScale(d[currentY])) // set the 'cx' .attr() to map from d => yScale() applied to d[currentY]
             .attr('r', d => circleRadius) // set the 'r' attr() to be the circleRadius
-            .attr(d => d.abbr) // set the class attr() to map from d => the d.abbr
+            .attr('class', d => d.abbr) // set the class attr() to map from d => the d.abbr
             .on('mouseover', function (d) { // .on 'mouseover' event, fire off a function that takes argument d
               // Show the tooltip
               toolTip.show(d); // use toolTip.show() with d and this as the arguments
@@ -313,9 +314,10 @@ function visualize(data) {
               // When the size of the text is the radius,
               // adding a third of the radius to the height
               // pushes it into the middle of the circle.
-              .attr('dy', d => yScale(d[currentY] + circleRadius / 2.5)) // set the 'dy' attr() to map from d => yScale() applied to d[currentY]) + circleRadius / 2.5
+              .attr('dy', d => yScale(d[currentY]) + circleRadius / 2.5) // set the 'dy' attr() to map from d => yScale() applied to d[currentY]) + circleRadius / 2.5
               .attr("font-size", circleRadius) // set the 'font-size' .attr() to circleRadius
-              .attr(d => d.abbr) // set the 'class' attr() to be from d => d.abbr
+              .attr('class', d => d.abbr) // set the 'class' attr() to be from d => d.abbr
+              .classed("stateText", true)
               .on('mouseover', function (d) { // on 'mouseover' event, fire off a function that takes argument d
                 // Show the tooltip
                 toolTip.show(d); // use toolTip.show() with d and this as the arguments
@@ -345,11 +347,11 @@ function visualize(data) {
     // if the data is already displayed on the graph.
     if (selectedLabel, "inactive") { // if the selectedLabel has the class 'inactive'
       // Grab the name and axis saved in label.
-      var axis = attr('data-axis'); // grab the 'data-axis' .attr() from the selectedLabel
-      var name = attr('data-name'); // grab the 'data-name' attr()
+      var axis = selectedLabel.attr('data-axis'); // grab the 'data-axis' .attr() from the selectedLabel
+      var name = selectedLabel.attr('data-name'); // grab the 'data-name' attr()
 
       // When x is the saved axis, execute this:
-      if (axis = x) { // if the axis is equal to 'x'
+      if (axis == "x") { // if the axis is equal to 'x'
         // Make currentX the same as the data name.
         currentX = name;
 
@@ -357,10 +359,10 @@ function visualize(data) {
         xMinMax(); // call the xMinMax() function
 
         // Update the domain of x.
-        domain([xMin, xMax]); // set the .domain() of xScale to be the [xMin, and xMax]
+        xScale.domain([xMin, xMax]); // set the .domain() of xScale to be the [xMin, and xMax]
 
         // Now use a transition when we update the xAxis.
-        svg.xAxis// select the .xAxis elements on the svg
+        svg.select(".xAxis")// select the .xAxis elements on the svg
             .transition() // set a transition()
             .duration(300) // give it a duration() of 300ms
             .call(xAxis); // call the xAxis
@@ -377,7 +379,7 @@ function visualize(data) {
         });
 
         // We need change the location of the state texts, too.
-        d3.selectAll('stateText').each(function() { // d3.selectAll() '.stateText' elements, and then use .each to fire off an anonymous function with no arguments
+        d3.selectAll('.stateText').each(function() { // d3.selectAll() '.stateText' elements, and then use .each to fire off an anonymous function with no arguments
           // We give each state text the same motion tween as the matching circle.
           d3.select(this)// use d3.select(this)
             .transition() // set a transition
@@ -388,7 +390,7 @@ function visualize(data) {
         // Finally, change the classes of the last active label and the clicked label.
         labelChange(axis, selectedLabel); // call the labelCahnge function with axis and selectedLabel as arguments
       }
-        else (axis = y) { //else
+        else { //else
         // do all the same steps you just did for x, but this time do them for y
           // Make currentX the same as the data name.
           currentY = name;
@@ -397,10 +399,10 @@ function visualize(data) {
           yMinMax(); // call the xMinMax() function
   
           // Update the domain of x.
-          domain([yMin, yMax]); // set the .domain() of xScale to be the [xMin, and xMax]
+          yScale.domain([yMin, yMax]); // set the .domain() of xScale to be the [xMin, and xMax]
   
           // Now use a transition when we update the xAxis.
-          svg.yAxis// select the .xAxis elements on the svg
+          svg.select(".yAxis")// select the .xAxis elements on the svg
               .transition() // set a transition()
               .duration(300) // give it a duration() of 300ms
               .call(yAxis); // call the xAxis
@@ -412,16 +414,16 @@ function visualize(data) {
             // from it's original spot to the new location.
             d3.select(this) // use d3.select(this)
               .transition() // set a transition
-              .attr('cx', d => xScale(d[currentY])) // set the 'cx' attribute to go from d => xScale applied to d[currentX]
+              .attr('cy', d => yScale(d[currentY])) // set the 'cx' attribute to go from d => xScale applied to d[currentX]
               .duration(300); // set the duration to 300ms
           });
   
           // We need change the location of the state texts, too.
-          d3.selectAll('stateText').each(function() { // d3.selectAll() '.stateText' elements, and then use .each to fire off an anonymous function with no arguments
+          d3.selectAll('.stateText').each(function() { // d3.selectAll() '.stateText' elements, and then use .each to fire off an anonymous function with no arguments
             // We give each state text the same motion tween as the matching circle.
             d3.select(this)// use d3.select(this)
               .transition() // set a transition
-              .attr('dx', d => xScale(d[currentY])) // set the 'dx' attribute to go from d => xScale applied to d[currentX]
+              .attr('dy', d => yScale(d[currentY])) // set the 'dx' attribute to go from d => xScale applied to d[currentX]
               .duration(300); // set the duration to 300ms
           });
   
