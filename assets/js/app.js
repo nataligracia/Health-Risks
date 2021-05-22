@@ -288,7 +288,8 @@ function visualize(data) {
             .attr('cx', d => xScale(d[currentX])) // set the 'cx' .attr() to map from d => xScale() applied to d[currentX]
             .attr('cy', d => yScale(d[currentY])) // set the 'cx' .attr() to map from d => yScale() applied to d[currentY]
             .attr('r', d => circleRadius) // set the 'r' attr() to be the circleRadius
-            .attr('class', d => d.abbr) // set the class attr() to map from d => the d.abbr
+            .attr('class', d => d.abbr)
+            .attr('class', d=> "stateCircle") // set the class attr() to map from d => the d.abbr
             .on('mouseover', function (d) { // .on 'mouseover' event, fire off a function that takes argument d
               // Show the tooltip
               toolTip.show(d); // use toolTip.show() with d and this as the arguments
@@ -300,7 +301,8 @@ function visualize(data) {
                 // Remove the tooltip
                 toolTip.hide(d); // use toolTip.hide() with d and this as the arguments
                 // Remove highlight
-                d3.select("stroke","royalblue"); // use d3.select() the this element, and modify the 'stroke' .style() to another color of your choosing
+                d3.select(this).transition()
+                    .style("stroke","royalblue"); // use d3.select() the this element, and modify the 'stroke' .style() to another color of your choosing
             });
 
   // With the circles on our graph, we need matching labels.
@@ -322,13 +324,15 @@ function visualize(data) {
                 // Show the tooltip
                 toolTip.show(d); // use toolTip.show() with d and this as the arguments
                 // Highlight the state text's border
-                d3.select("stroke", "green"); // use d3.select() the this element, and modify the 'stroke' .style() to a color of your choosing
+                d3.select(this).transition()
+                    .style("stroke", "green"); // use d3.select() the this element, and modify the 'stroke' .style() to a color of your choosing
               })
               .on('mouseout', function (d) { // on 'mouseout' fire off a function that takes argument d
                   // Remove the tooltip
                   toolTip.hide(d); // use toolTip.hide() with d and this as the arguments
                   // Remove highlight
-                  d3.select("stroke", "pink"); // use d3.select() the this element, and modify the 'stroke' .style() to another color of your choosing
+                  d3.select(this).transition()
+                      .style("stroke", "pink"); // use d3.select() the this element, and modify the 'stroke' .style() to another color of your choosing
               });
 
   // Part 4: Make the Graph Dynamic
